@@ -84,11 +84,6 @@ const handleMove = (source, target) => {
     };
 
     const validMove = chess.move(move);
-    if (validMove.captured) {
-        capturingSound.play();
-    } else {
-        movingSound.play();
-    }
     if (validMove) {
         socket.emit("move", move);
     } else {
@@ -136,5 +131,13 @@ socket.on("move", (move) => {
     // console.log("Received move:", move);
     chess.move(move);
     renderBoard();
+});
+
+socket.on("sound", (type) => {
+    if (type === "capture") {
+        capturingSound.play();
+    } else {
+        movingSound.play();
+    }
 });
 renderBoard();

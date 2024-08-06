@@ -59,6 +59,11 @@ io.on("connection", (socket) => {
             const result = chess.move(move);
 
             if (result) {
+                if (result.captured) {
+                    io.emit("sound", "capture");
+                } else {
+                    io.emit("sound", "move");
+                }
                 io.emit("move", move);
                 io.emit("boardState", chess.fen()); // Emit updated board state
             } else {
