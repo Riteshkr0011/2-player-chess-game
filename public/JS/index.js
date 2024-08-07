@@ -77,14 +77,23 @@ const renderBoard = () => {
 };
 
 const handleMove = (source, target) => {
-    const move = {
+    let move = {
         from: `${String.fromCharCode(97 + source.col)}${8 - source.row}`,
         to: `${String.fromCharCode(97 + target.col)}${8 - target.row}`,
         promotion: 'q' // Default to Queen promotion
     };
 
+    if (chess.get(move.from).type === 'k' && Math.abs(source.col - target.col) === 2) {
+        if (target.col === 6) {
+            move = { from: move.from, to: 'g' + move.from[1] }; // Kingside castling
+        } else if (target.col === 2) {
+            move = { from: move.from, to: 'c' + move.from[1] }; // Queenside castling
+        }
+    }
+    console.log(`Attempting move: ${JSON.stringify(move)}`);
     const validMove = chess.move(move);
     if (validMove) {
+        console.log(`Move successful: ${JSON.stringify(validMove)}`);
         socket.emit("move", move);
     } else {
         console.error("Invalid move", move);
@@ -128,7 +137,7 @@ socket.on("boardState", (fen) => {
 });
 
 socket.on("move", (move) => {
-    // console.log("Received move:", move);
+    console.log(`Received move: ${JSON.stringify(move)}`);
     chess.move(move);
     renderBoard();
 });
