@@ -1,0 +1,19 @@
+<%- include('partials/header.ejs') %>
+<body>
+<div class="mainBg w-full h-screen flex justify-center items-center">
+    <div class="Form flex flex-col justify-center items-center w-96 h-96 bg-white rounded-bl-lg rounded-tl-lg p-7">
+        <div class="mainForm flex flex-col items-center justify-center bg-black bg-opacity-70 p-0 rounded-lg">
+            <div class = "flex flex-col justify-center ">
+                <h1 class="text-2xl text-white m-8">Enter your name</h1>
+                <input type="text" placeholder="Username" class="w-full mb-4 p-3 text-black rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                <button class="w-full p-3 border-2 border-green-500 text-green-500 rounded hover:bg-green-500 hover:text-white transition duration-300">Play</button>
+            </div>
+        </div>
+    </div>
+    <div class="flex justify-center items-center h-80 sm:w-96 sm:h-96 bg-zinc-800 rounded-tr-lg rounded-br-lg overflow-y-auto">
+        <img src="/elo450-high-resolution-logo-white-transparent.png" alt="Game Logo">
+    </div>
+</div>
+    <%- include('partials/footer.ejs') %>
+</body>
+</html>

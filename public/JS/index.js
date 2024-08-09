@@ -124,9 +124,9 @@ const getPieceUnicode = (piece) => {
 const addMoveToList = (currentMove) => {
     const movesList = document.querySelector("ul");
     const moveItem = document.createElement("li");
-    const innerTextOfList = `${movesCounter}. ${currentMove.san}`;
+    const innerTextOfList = `<p>${movesCounter}. ${currentMove.san}</p>`;
 
-    moveItem.textContent = innerTextOfList;
+    moveItem.innerHTML = innerTextOfList;
     movesList.appendChild(moveItem);
     if (movesCounter % 2 != 0) {
         moveItem.classList.add("movesByWhite", "bg-white");
@@ -166,10 +166,15 @@ socket.on("move", (move) => {
     renderBoard();
 });
 
-socket.on("currentPlayerCount", async (playerCount) => {
+socket.on("currentPlayerCount", async (playerCount, playerType) => {
     const displayBox = document.querySelector('.messageDisplayBox');
+    const movesList = document.querySelector("ul");
 
-    if (playerCount >= 2) {
+    if (playerType == 0) {
+        displayBox.innerHTML = "<h1>Board is Busy</h1>"
+        await sleep(2500);
+        displayBox.innerHTML = "<h1>You are a Spectator</h1>"
+    } else if (playerCount >= 2) {
         displayBox.innerHTML = "<h1>Game Started</h1>";
         await sleep(2500); // Wait for 2.5 seconds
 
@@ -178,6 +183,9 @@ socket.on("currentPlayerCount", async (playerCount) => {
 
         displayBox.innerHTML = "<h1>Best of Luck 👍</h1>";
         await sleep(2500); // Wait for another 2.5 seconds
+
+        movesList.innerHTML = ""
+        socket.emit("gameStarted");
 
         displayBox.innerHTML = ""; // Clear the message display box
 

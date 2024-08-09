@@ -24,22 +24,29 @@ app.use(express.static(path.join(__dirname, "Public")));
 
 // Serve the index.ejs file
 app.get("/", (req, res) => {
+    res.render("homepage");
+});
+
+app.get("/match", (req, res) => {
     res.render("index");
 });
 
 io.on("connection", (socket) => {
+    let currentPlayerType = 0;
     if (!players.white) {
         playersCount += 1;
         players.white = socket.id;
+        currentPlayerType = 1;
         socket.emit("playerRole", "w");
     } else if (!players.black) {
         playersCount += 1;
         players.black = socket.id;
+        currentPlayerType = 1;
         socket.emit("playerRole", "b");
     } else {
         socket.emit("spectatorRole");
     }
-    io.emit("currentPlayerCount", (playersCount));
+    io.emit("currentPlayerCount", playersCount, currentPlayerType);
 
     // Send the current board state to the newly connected player
     socket.emit("boardState", chess.fen());
@@ -77,7 +84,6 @@ io.on("connection", (socket) => {
                 if (chess.isGameOver()) {
                     io.emit("sound", "gameOver");
                     io.emit("gameover");
-                    chess.reset();
                     setTimeout(() => {
                         chess.reset();
                         io.emit("boardState", chess.fen());
@@ -92,6 +98,11 @@ io.on("connection", (socket) => {
             socket.emit("invalidMove", move);
         }
     });
+
+    socket.on("gameStarted", () => {
+        chess.reset();
+        io.emit("boardState", chess.fen());
+    })
 });
 
 server.listen(port, () => {
