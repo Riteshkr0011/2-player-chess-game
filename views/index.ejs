@@ -9,10 +9,15 @@
     <link rel="stylesheet" href="/css/loader.css">
 </head>
 <body>
-    <div class="w-full h-screen flex items-center justify-center bg-zinc-900">
-        <div class="chessBoard w-96 h-96 bg-red-800"></div>
-        <div class="movesSection w-80 h-80 sm:w-96 sm:h-96 bg-zinc-800 rounded-tr-lg rounded-br-lg m-2 overflow-y-auto">
-            <ul id="moveList" class="p-4 text-white font-mono"></ul>
+    <div class="w-full h-screen bg-zinc-900">
+        <div class = "flex flex-col items-center">
+            <div class="messageDisplayBox flex items-center justify-center w-96 h-40 text-white"></div>
+            <div class="flex items-center justify-center">
+                <div class="chessBoard w-96 h-96 bg-red-800"></div>
+                <div class="movesSection w-80 h-80 sm:w-96 sm:h-96 bg-zinc-800 rounded-tr-lg rounded-br-lg m-2 overflow-y-auto">
+                    <ul id="moveList" class="p-4 text-white font-mono"></ul>
+                </div>
+            </div>
         </div>
     </div>
 

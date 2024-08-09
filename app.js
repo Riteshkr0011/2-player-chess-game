@@ -16,6 +16,7 @@ const io = new Server(server);
 const chess = new Chess();
 
 let players = {};
+let playersCount = 0;
 
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "Public")));
@@ -27,17 +28,18 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-    console.log("Player connected: ", socket.id);
-
     if (!players.white) {
+        playersCount += 1;
         players.white = socket.id;
         socket.emit("playerRole", "w");
     } else if (!players.black) {
+        playersCount += 1;
         players.black = socket.id;
         socket.emit("playerRole", "b");
     } else {
         socket.emit("spectatorRole");
     }
+    io.emit("currentPlayerCount", (playersCount));
 
     // Send the current board state to the newly connected player
     socket.emit("boardState", chess.fen());
@@ -45,10 +47,13 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
 
         if (socket.id === players.white) {
+            playersCount -= 1;
             delete players.white;
         } else if (socket.id === players.black) {
+            playersCount -= 1;
             delete players.black;
         }
+        io.emit("currentPlayerCount", (playersCount));
     });
 
     socket.on("move", (move) => {

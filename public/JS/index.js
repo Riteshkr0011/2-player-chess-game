@@ -2,6 +2,7 @@ const socket = io();
 const chess = new Chess();
 
 const boardElement = document.querySelector(".chessBoard");
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let draggedPiece = null;
 let sourceSquare = null;
@@ -163,6 +164,26 @@ socket.on("move", (move) => {
     // console.log(`Received move: ${JSON.stringify(move)}`);
     chess.move(move);
     renderBoard();
+});
+
+socket.on("currentPlayerCount", async (playerCount) => {
+    const displayBox = document.querySelector('.messageDisplayBox');
+
+    if (playerCount >= 2) {
+        displayBox.innerHTML = "<h1>Game Started</h1>";
+        await sleep(2500); // Wait for 2.5 seconds
+
+        displayBox.innerHTML = "<h1>Play Fair</h1>";
+        await sleep(2500); // Wait for another 2.5 seconds
+
+        displayBox.innerHTML = "<h1>Best of Luck 👍</h1>";
+        await sleep(2500); // Wait for another 2.5 seconds
+
+        displayBox.innerHTML = ""; // Clear the message display box
+
+    } else {
+        displayBox.innerHTML = "<h1>Waiting for opponent...</h1>"
+    }
 });
 
 socket.on("addToMoveList", (currentMove) => {
