@@ -11,6 +11,7 @@ let playerCount = 0;
 let capturingSound = new Audio("/capture.mp3");
 let movingSound = new Audio("/move-self.mp3");
 let illegalMoveSound = new Audio("/illegal.mp3");
+let gameOver = new Audio("/game-end.mp3");
 
 const renderBoard = () => {
     const board = chess.board();
@@ -146,6 +147,8 @@ socket.on("move", (move) => {
 socket.on("sound", (type) => {
     if (type === "capture") {
         capturingSound.play();
+    } else if (type === "gameOver") {
+        window.setTimeout(gameOver.play(), 400);
     } else {
         movingSound.play();
     }
