@@ -153,4 +153,9 @@ socket.on("sound", (type) => {
         movingSound.play();
     }
 });
+
+socket.on("gameover", () => {
+    chess.reset();
+    io.emit("boardState", chess.fen());
+});
 renderBoard();

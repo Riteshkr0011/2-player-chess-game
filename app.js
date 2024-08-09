@@ -69,6 +69,12 @@ io.on("connection", (socket) => {
 
                 if (chess.isGameOver()) {
                     io.emit("sound", "gameOver");
+                    io.emit("gameover");
+                    chess.reset();
+                    setTimeout(() => {
+                        chess.reset();
+                        io.emit("boardState", chess.fen());
+                    }, 1000);
                 }
             } else {
                 console.log("Invalid move: ", move);
