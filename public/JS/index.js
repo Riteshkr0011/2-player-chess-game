@@ -10,6 +10,7 @@ let playerCount = 0;
 
 let capturingSound = new Audio("/capture.mp3");
 let movingSound = new Audio("/move-self.mp3");
+let illegalMoveSound = new Audio("/illegal.mp3");
 
 const renderBoard = () => {
     const board = chess.board();
@@ -90,12 +91,12 @@ const handleMove = (source, target) => {
             move = { from: move.from, to: 'c' + move.from[1] }; // Queenside castling
         }
     }
-    console.log(`Attempting move: ${JSON.stringify(move)}`);
     const validMove = chess.move(move);
     if (validMove) {
         console.log(`Move successful: ${JSON.stringify(validMove)}`);
         socket.emit("move", move);
     } else {
+        illegalMoveSound.play();
         console.error("Invalid move", move);
     }
 };
