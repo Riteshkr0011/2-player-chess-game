@@ -6,7 +6,7 @@ const boardElement = document.querySelector(".chessBoard");
 let draggedPiece = null;
 let sourceSquare = null;
 let playerRole = null;
-let playerCount = 0;
+let movesCounter = 1;
 
 let capturingSound = new Audio("/capture.mp3");
 let movingSound = new Audio("/move-self.mp3");
@@ -94,7 +94,6 @@ const handleMove = (source, target) => {
     }
     const validMove = chess.move(move);
     if (validMove) {
-        console.log(`Move successful: ${JSON.stringify(validMove)}`);
         socket.emit("move", move);
     } else {
         illegalMoveSound.play();
@@ -121,6 +120,29 @@ const getPieceUnicode = (piece) => {
     return unicodePieces[piece.type] || "";
 };
 
+const addMoveToList = (currentMove) => {
+    const movesList = document.querySelector("ul");
+    const moveItem = document.createElement("li");
+    const innerTextOfList = `${movesCounter}. ${currentMove.san}`;
+
+    moveItem.textContent = innerTextOfList;
+    movesList.appendChild(moveItem);
+    if (movesCounter % 2 != 0) {
+        moveItem.classList.add("movesByWhite", "bg-white");
+    } else {
+        moveItem.classList.add("movesByBlack", "bg-zinc-700");
+    }
+    movesCounter += 1;
+    console.log(JSON.stringify({ currentMove }));
+
+    // Auto-scroll to the bottom of the list
+    movesList.scrollTop = movesList.scrollHeight;
+}
+
+window.addEventListener("onload", () => {
+    const movesList = document.querySelector("ul");
+    movesList.innerHTML = "";
+});
 
 socket.on("playerRole", (role) => {
     playerRole = role;
@@ -133,16 +155,19 @@ socket.on("spectatorRole", () => {
 });
 
 socket.on("boardState", (fen) => {
-    // console.log("Received FEN:", fen);
     chess.load(fen);
     renderBoard();
 });
 
 socket.on("move", (move) => {
-    console.log(`Received move: ${JSON.stringify(move)}`);
+    // console.log(`Received move: ${JSON.stringify(move)}`);
     chess.move(move);
     renderBoard();
 });
+
+socket.on("addToMoveList", (currentMove) => {
+    addMoveToList(currentMove);
+})
 
 socket.on("sound", (type) => {
     if (type === "capture") {
@@ -157,5 +182,7 @@ socket.on("sound", (type) => {
 socket.on("gameover", () => {
     chess.reset();
     io.emit("boardState", chess.fen());
+    const movesList = document.querySelector("ul");
+    movesList.innerHTML = "";
 });
 renderBoard();

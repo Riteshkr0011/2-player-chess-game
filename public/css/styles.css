@@ -52,3 +52,12 @@
 .flipped .piece {
     transform: rotate(180deg); 
 }
+
+.movesByWhite{
+    background-color: aliceblue;
+    color: black
+};
+
+.movesByBlack{
+    background-color: darkgrey;
+}
