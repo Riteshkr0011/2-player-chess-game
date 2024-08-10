@@ -5,7 +5,7 @@ import http from "http";
 import path from "path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { Socket } from "dgram";
+import bodyParser from "body-parser";
 
 const app = express();
 const port = 3000;
@@ -21,10 +21,17 @@ let playersCount = 0;
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "Public")));
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
 // Serve the index.ejs file
 app.get("/", (req, res) => {
     res.render("homepage");
+});
+
+app.post("/", (req, res) => {
+    console.log(req.body);
+    res.redirect("/match");
 });
 
 app.get("/match", (req, res) => {

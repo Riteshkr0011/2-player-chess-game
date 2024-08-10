@@ -1,0 +1,18 @@
+
+.mainBg {
+    background-image: url('../phpo1V4f7.png') ;
+    background-position: center;
+    background-size: cover;
+    filter: contrast(115%);
+}
+
+.Form {
+    background-image: url('../board-game-1846400_1280.jpg') ;
+    background-position: center;
+    background-size: cover;
+}
+
+.mainForm {
+    height: 100%;
+    width: 100%;
+}
