@@ -1,4 +1,10 @@
 /* style.css */
+
+body {
+    background-image: url('../phpm9PJli.png');
+    background-position: center;
+    background-size: cover;
+}
 .chessBoard {
     display: grid;
     grid-template-columns: repeat(8, minmax(0, 1fr));

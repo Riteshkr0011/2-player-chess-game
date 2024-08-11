@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, "Public")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// Serve the index.ejs file
+// Serve the homepage.ejs file
 app.get("/", (req, res) => {
     res.render("homepage");
 });
@@ -39,35 +39,36 @@ app.get("/match", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-    let currentPlayerType = 0;
     if (!players.white) {
         playersCount += 1;
         players.white = socket.id;
-        currentPlayerType = 1;
         socket.emit("playerRole", "w");
+        io.emit("displayMessage", playersCount);
     } else if (!players.black) {
         playersCount += 1;
         players.black = socket.id;
-        currentPlayerType = 1;
         socket.emit("playerRole", "b");
+        io.emit("displayMessage", playersCount);
     } else {
         socket.emit("spectatorRole");
+        socket.emit("displayMessage", playersCount);
     }
-    io.emit("currentPlayerCount", playersCount, currentPlayerType);
+
 
     // Send the current board state to the newly connected player
     socket.emit("boardState", chess.fen());
 
     socket.on("disconnect", () => {
-
         if (socket.id === players.white) {
             playersCount -= 1;
             delete players.white;
+            io.emit("displayMessage", playersCount);
         } else if (socket.id === players.black) {
             playersCount -= 1;
             delete players.black;
+            io.emit("displayMessage", playersCount);
         }
-        io.emit("currentPlayerCount", (playersCount));
+        // io.emit("displayMessage", playersCount, );
     });
 
     socket.on("move", (move) => {
@@ -78,7 +79,6 @@ io.on("connection", (socket) => {
             const result = chess.move(move);
 
             if (result) {
-
                 if (result.captured) {
                     io.emit("sound", "capture");
                 } else {
@@ -109,7 +109,7 @@ io.on("connection", (socket) => {
     socket.on("gameStarted", () => {
         chess.reset();
         io.emit("boardState", chess.fen());
-    })
+    });
 });
 
 server.listen(port, () => {

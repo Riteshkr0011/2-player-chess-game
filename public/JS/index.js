@@ -17,7 +17,6 @@ let gameOver = new Audio("/game-end.mp3");
 const renderBoard = () => {
     const board = chess.board();
     boardElement.innerHTML = "";
-    // console.log(board);
 
     board.forEach((row, rowIndex) => {
         row.forEach((square, squareIndex) => {
@@ -134,13 +133,12 @@ const addMoveToList = (currentMove) => {
         moveItem.classList.add("movesByBlack", "bg-zinc-700");
     }
     movesCounter += 1;
-    console.log(JSON.stringify({ currentMove }));
 
     // Auto-scroll to the bottom of the list
     movesList.scrollTop = movesList.scrollHeight;
 }
 
-window.addEventListener("onload", () => {
+window.addEventListener("load", () => {
     const movesList = document.querySelector("ul");
     movesList.innerHTML = "";
 });
@@ -161,57 +159,54 @@ socket.on("boardState", (fen) => {
 });
 
 socket.on("move", (move) => {
-    // console.log(`Received move: ${JSON.stringify(move)}`);
     chess.move(move);
     renderBoard();
 });
 
-socket.on("currentPlayerCount", async (playerCount, playerType) => {
-    const displayBox = document.querySelector('.messageDisplayBox');
-    const movesList = document.querySelector("ul");
+socket.on("displayMessage", async (playerCount) => {
+    const messageBox = document.querySelector(".messageDisplayBox");
+    console.log(playerRole, playerCount);
 
-    if (playerType == 0) {
-        displayBox.innerHTML = "<h1>Board is Busy</h1>"
-        await sleep(2500);
-        displayBox.innerHTML = "<h1>You are a Spectator</h1>"
-    } else if (playerCount >= 2) {
-        displayBox.innerHTML = "<h1>Game Started</h1>";
-        await sleep(2500); // Wait for 2.5 seconds
-
-        displayBox.innerHTML = "<h1>Play Fair</h1>";
-        await sleep(2500); // Wait for another 2.5 seconds
-
-        displayBox.innerHTML = "<h1>Best of Luck 👍</h1>";
-        await sleep(2500); // Wait for another 2.5 seconds
-
-        movesList.innerHTML = ""
-        socket.emit("gameStarted");
-
-        displayBox.innerHTML = ""; // Clear the message display box
-
+    if (playerRole === 'w' || playerRole === 'b') {
+        if (playerCount === 2) {
+            messageBox.innerHTML = "<h1>Game Started</h1>";
+            await sleep(2000);
+            messageBox.innerHTML = "<h1>Play Fair</h1>";
+            await sleep(2000);
+            messageBox.innerHTML = "<h1>Best of Luck</h1>";
+            await sleep(2000);
+            messageBox.innerHTML = "";
+            return;
+        }
+        if (playerCount < 2) {
+            messageBox.innerHTML = "<h1>Waiting for Opponents...</h1>";
+        }
+        return;
     } else {
-        displayBox.innerHTML = "<h1>Waiting for opponent...</h1>"
+        messageBox.innerHTML = "<h1>You are a Spectator</h1>";
     }
 });
 
 socket.on("addToMoveList", (currentMove) => {
     addMoveToList(currentMove);
-})
+});
 
 socket.on("sound", (type) => {
-    if (type === "capture") {
-        capturingSound.play();
-    } else if (type === "gameOver") {
-        window.setTimeout(gameOver.play(), 400);
-    } else {
-        movingSound.play();
+    switch (type) {
+        case "capture":
+            capturingSound.play();
+            break;
+        case "move":
+            movingSound.play();
+            break;
+        case "gameOver":
+            gameOver.play();
+            break;
+        default:
+            break;
     }
 });
 
-socket.on("gameover", () => {
-    chess.reset();
-    io.emit("boardState", chess.fen());
-    const movesList = document.querySelector("ul");
-    movesList.innerHTML = "";
+socket.on("invalidMove", (move) => {
+    illegalMoveSound.play();
 });
-renderBoard();
